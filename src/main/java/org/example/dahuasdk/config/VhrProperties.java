@@ -21,6 +21,7 @@ public class VhrProperties {
     private String updateDevicesStatusUri;
     private String middlewareHealthCheckUri;
     private String middlewareRequestHeaderName;
+    private String saveDeviceEventsUri;
 
     public String loadCommandsUrl(String host) {
         return host + loadCommandsUri;
@@ -44,5 +45,9 @@ public class VhrProperties {
 
     public String middlewareRequestHeaderName() {
         return middlewareRequestHeaderName == null || middlewareRequestHeaderName.isBlank() ? "middleware_token" : middlewareRequestHeaderName;
+    }
+
+    public String saveDeviceEventsUri(String host) {
+        return host + saveDeviceEventsUri;
     }
 }

@@ -23,11 +23,11 @@ import java.util.Objects;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-
 public class AutoRegisterService {
     static final private NetSDKLib netsdk = NetSDKLib.NETSDK_INSTANCE;
     private final AppService appService;
     private final AppDAO dao;
+    private final EventReceiverService eventReceiver;
 
     private class DisConnect implements NetSDKLib.fDisConnect {
         public void invoke(NetSDKLib.LLong m_hLoginHandle, String pchDVRIP, int nDVRPort, Pointer dwUser) {
@@ -73,8 +73,6 @@ public class AutoRegisterService {
                     break;
                 }
                 case NetSDKLib.EM_LISTEN_TYPE.NET_DVR_SERIAL_RETURN: {
-
-
                     String finalDeviceId = deviceId;
                     new SwingWorker<Boolean, String>() {
                         @Override
@@ -100,6 +98,9 @@ public class AutoRegisterService {
 
                             deviceConnectionInfo.put(finalDeviceId, deviceInfo);
                             System.out.println("Connected");
+
+                            NetSDKLib.LLong eventListenHandle = eventReceiver.eventListeningStart(netsdk, loginHandle, finalDeviceId);
+                            
                             return true;
                         }
 

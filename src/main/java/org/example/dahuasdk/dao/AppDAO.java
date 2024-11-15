@@ -22,4 +22,5 @@ public interface AppDAO {
     Device findDeviceByMiddlewareIdAndVhrId(long middlewareId, long vhrId);
     boolean existsDeviceByMiddlewareIdAndVhrId(long middlewareId, long vhrId);
     Device findDeviceByDeviceId(String deviceId);
+    Middleware findMiddlewareByDeviceId(String deviceId);
 }

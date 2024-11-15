@@ -119,4 +119,14 @@ public class AppDAOImpl implements AppDAO {
 
         return query.getSingleResult();
     }
+
+    @Override
+    public Middleware findMiddlewareByDeviceId(String deviceId) {
+        TypedQuery<Middleware> query = entityManager.createQuery(
+                "SELECT d.middleware FROM Device d WHERE d.deviceId = :deviceId", Middleware.class
+        );
+        query.setParameter("deviceId", deviceId);
+
+        return query.getSingleResult();
+    }
 }

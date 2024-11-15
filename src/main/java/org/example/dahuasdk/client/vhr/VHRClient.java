@@ -8,6 +8,7 @@ import org.example.dahuasdk.client.vhr.entity.load.FaceImage;
 import org.example.dahuasdk.client.vhr.entity.load.Photo;
 import org.example.dahuasdk.client.vhr.entity.save.CommandsResult;
 import org.example.dahuasdk.config.VhrProperties;
+import org.example.dahuasdk.dto.EventDTO;
 import org.example.dahuasdk.entity.Middleware;
 import okhttp3.*;
 import org.example.dahuasdk.schedule.ApplicationScheduler;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -168,6 +170,32 @@ public class VHRClient {
             return contentDisposition.substring(contentDisposition.indexOf("filename=") + 10, contentDisposition.length() - 1);
         } catch (Exception e) {
             return "photo.jpeg";
+        }
+    }
+
+    public void sendEvents(Middleware middleware, List<EventDTO> events) {
+        try {
+            Map<String, Object> bodyMap = new HashMap<>();
+            bodyMap.put("middleware", Map.of("token", middleware.getToken()));
+
+            RequestBody body = createRequestBody(bodyMap);
+
+            Request request = new Request.Builder()
+                    .url(properties.saveDeviceEventsUri(middleware.getHost()))
+                    .header("Authorization", "Basic " + middleware.getCredentials())
+                    .header(properties.middlewareRequestHeaderName(), middleware.getToken())
+                    .post(body)
+                    .build();
+
+            try (Response response = vhrHttpClient.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    assert response.body() != null;
+                    log.warn("Send device event request to VHR failed. middlewareId: {}, host: {}, code: {}, message: {}",
+                            middleware.getId(), middleware.getHost(), response.code(), response.body().string());
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error occurred while sending events to VHR. middlewareId: {}, host: {}", middleware.getId(), middleware.getHost(), e);
         }
     }
 }
